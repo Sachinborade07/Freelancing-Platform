@@ -1,4 +1,3 @@
-// src/freelancer-skills/entities/freelancer-skill.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Freelancer } from './freelancer.entity';
 import { Skill } from './skill.entity';

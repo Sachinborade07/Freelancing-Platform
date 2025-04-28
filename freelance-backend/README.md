@@ -31,6 +31,17 @@
 $ npm install
 $ npm install @nestjs/typeorm typeorm pg
 $ npm install @nestjs/config
+$ npm install @nestjs/mapped-types
+$ npm install @nestjs/jwt
+$ npm install @nestjs/passport passport
+$ npm install class-transformer
+$ npm install @nestjs/throttler
+$ npm install @nestjs/cache-manager
+$ npm install @nestjs/swagger swagger-ui-express
+$ npm install --save-dev @types/multer
+$ npm install --save-dev @types/express
+$ npm install passport-local
+$ npm install bcrypt
 ```
 
 ## Compile and run the project
