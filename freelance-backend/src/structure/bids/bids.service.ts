@@ -35,6 +35,7 @@ export class BidsService {
 
         const bid = this.bidsRepository.create({
             ...createBidDto,
+            bid_amount: Number(createBidDto.bid_amount),
             project,
             freelancer,
         });
@@ -74,7 +75,10 @@ export class BidsService {
 
     async update(id: number, updateBidDto: UpdateBidDto): Promise<Bid> {
         const bid = await this.findOne(id);
-        this.bidsRepository.merge(bid, updateBidDto);
+        this.bidsRepository.merge(bid, {
+            ...updateBidDto,
+            bid_amount: updateBidDto.bid_amount ? Number(updateBidDto.bid_amount) : undefined,
+        });
         return await this.bidsRepository.save(bid);
     }
 

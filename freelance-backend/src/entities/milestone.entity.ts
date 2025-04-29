@@ -1,4 +1,3 @@
-// src/milestones/entities/milestone.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne } from 'typeorm';
 import { Project } from './project.entity';
 import { Invoice } from './invoice.entity';

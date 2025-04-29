@@ -1,16 +1,12 @@
-import { IsEmail, IsString, IsIn } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class LoginDto {
     @IsEmail()
-    @Type(() => String)
+    @IsNotEmpty()
     email: string;
 
     @IsString()
-    @Type(() => String)
+    @MinLength(8)
+    @IsNotEmpty()
     password: string;
-
-    @IsIn(['client', 'freelancer'])
-    @Type(() => String)
-    role: 'client' | 'freelancer';
 }

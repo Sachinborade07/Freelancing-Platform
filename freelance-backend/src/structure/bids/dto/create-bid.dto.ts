@@ -13,8 +13,7 @@ export class CreateBidDto {
 
     @IsNotEmpty()
     @IsDecimal()
-    @Min(0.01)
-    bid_amount: number;
+    bid_amount: string;
 
     @IsNotEmpty()
     @IsString()

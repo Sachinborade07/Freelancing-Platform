@@ -26,6 +26,7 @@ export class InvoicesService {
         const invoice = this.invoicesRepository.create({
             ...createInvoiceDto,
             milestone,
+            amount: Number(createInvoiceDto.amount),
         });
         return await this.invoicesRepository.save(invoice);
     }
@@ -58,7 +59,10 @@ export class InvoicesService {
 
     async update(id: number, updateInvoiceDto: UpdateInvoiceDto): Promise<Invoice> {
         const invoice = await this.findOne(id);
-        this.invoicesRepository.merge(invoice, updateInvoiceDto);
+        this.invoicesRepository.merge(invoice, {
+            ...updateInvoiceDto,
+            amount: updateInvoiceDto.amount ? Number(updateInvoiceDto.amount) : undefined,
+        });
         return await this.invoicesRepository.save(invoice);
     }
 

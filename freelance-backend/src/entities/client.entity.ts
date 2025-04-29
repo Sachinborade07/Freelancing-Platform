@@ -10,10 +10,10 @@ export class Client {
     @Column()
     user_id: number;
 
-    @Column({ length: 100, nullable: true })
+    @Column({ length: 100 })
     company_name: string;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'text' })
     address: string;
 
     @OneToOne(() => Users)

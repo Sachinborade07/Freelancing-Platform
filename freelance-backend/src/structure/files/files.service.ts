@@ -19,14 +19,14 @@ export class FilesService {
 
     async create(createFileDto: CreateFileDto): Promise<File> {
         const uploader = await this.usersRepository.findOne({
-            where: { user_id: createFileDto.uploader_id },
+            where: { user_id: Number(createFileDto.uploader_id) },
         });
         if (!uploader) {
             throw new NotFoundException('Uploader not found');
         }
 
         const project = await this.projectsRepository.findOne({
-            where: { project_id: createFileDto.project_id },
+            where: { project_id: Number(createFileDto.project_id) },
         });
         if (!project) {
             throw new NotFoundException('Project not found');

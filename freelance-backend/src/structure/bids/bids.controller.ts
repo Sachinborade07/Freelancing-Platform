@@ -19,12 +19,12 @@ export class BidsController {
         return this.bidsService.findAll();
     }
 
-    @Get('project/:projectId')
+    @Get('projects/:projectId')
     findByProject(@Param('projectId') projectId: string) {
         return this.bidsService.findByProject(+projectId);
     }
 
-    @Get('freelancer/:freelancerId')
+    @Get('freelancers/:freelancerId')
     findByFreelancer(@Param('freelancerId') freelancerId: string) {
         return this.bidsService.findByFreelancer(+freelancerId);
     }

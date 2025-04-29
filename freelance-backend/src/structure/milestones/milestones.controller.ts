@@ -17,7 +17,7 @@ export class MilestonesController {
         return this.milestonesService.findAll();
     }
 
-    @Get('project/:projectId')
+    @Get('projects/:projectId')
     findByProject(@Param('projectId') projectId: string) {
         return this.milestonesService.findByProject(+projectId);
     }

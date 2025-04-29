@@ -7,15 +7,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
-import { ClientsModule } from 'src/structure/clients/clients.module';
-import { FreelancersModule } from 'src/structure/freelancers/freelancers.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
-    ClientsModule,
-    FreelancersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

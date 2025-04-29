@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -15,11 +15,11 @@ export class ProjectsController {
     }
 
     @Get()
-    findAll(@Body() query: ProjectQueryDto) {
+    findAll(@Query() query: ProjectQueryDto) {
         return this.projectsService.findAll(query);
     }
 
-    @Get('client/:clientId')
+    @Get('clients/:clientId')
     findByClient(@Param('clientId') clientId: string) {
         return this.projectsService.findByClient(+clientId);
     }

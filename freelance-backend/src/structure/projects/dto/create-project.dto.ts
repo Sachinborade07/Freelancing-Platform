@@ -1,6 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString, IsDecimal, IsDate, Min, IsOptional } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsNumber,
+    IsString,
+    Min,
+    IsOptional,
+    IsDateString,
+    IsEnum,
+} from 'class-validator';
 import { IsValidProjectStatus } from 'src/validator/project-status.validator';
-
 
 export class CreateProjectDto {
     @IsNotEmpty()
@@ -13,19 +20,18 @@ export class CreateProjectDto {
 
     @IsOptional()
     @IsString()
-    description?: string;
-
-    @IsOptional()
-    @IsDecimal()
-    @Min(0)
-    budget?: number;
-
-    @IsOptional()
-    @IsString()
-    @IsValidProjectStatus(['draft'])
-    status?: string;
+    description: string;
 
     @IsNotEmpty()
-    @IsDate()
-    deadline: Date;
+    @IsNumber()
+    @Min(0)
+    budget: number;
+
+    @IsNotEmpty()
+    @IsValidProjectStatus(['draft', 'posted', 'in_progress', 'completed', 'cancelled'])
+    status: string;
+
+    @IsNotEmpty()
+    @IsDateString()
+    deadline: string;
 }

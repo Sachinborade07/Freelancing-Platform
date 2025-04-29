@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString, IsDate, IsOptional } from 'class-validator';
 import { IsValidMilestoneStatus } from 'src/validator/milestone-status.validator';
 
@@ -10,16 +11,15 @@ export class CreateMilestoneDto {
     @IsString()
     title: string;
 
-    @IsOptional()
     @IsString()
-    description?: string;
+    description: string;
 
-    @IsOptional()
+
+    @Type(() => Date)
     @IsDate()
     due_date?: Date;
 
-    @IsOptional()
     @IsString()
     @IsValidMilestoneStatus(['pending'])
-    status?: string;
+    status: string;
 }

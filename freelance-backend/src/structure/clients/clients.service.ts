@@ -20,7 +20,7 @@ export class ClientsService {
             where: {
                 user: { email }
             },
-            relations: ['user']
+            relations: ['user', 'projects']
         });
         if (!client) {
             throw new NotFoundException(`Client with email ${email} not found`);

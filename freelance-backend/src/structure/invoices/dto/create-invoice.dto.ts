@@ -8,8 +8,7 @@ export class CreateInvoiceDto {
 
     @IsNotEmpty()
     @IsDecimal()
-    @Min(0.01)
-    amount: number;
+    amount: string;
 
     @IsNotEmpty()
     @IsString()
