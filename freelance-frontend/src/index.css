@@ -1,0 +1,3 @@
+@import "tailwindcss";
+@import "@traken-ui/react/dist/traken-theme.css";
+@import "@traken-ui/react/dist/esm/index.css";
