@@ -28,7 +28,7 @@ import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
     }),
     ThrottlerModule.forRoot([{
       ttl: 60000, // 1 minute
-      limit: 5, // 5 requests per minute
+      limit: 10,
     }]),
     DatabaseModule,
     AuthModule,

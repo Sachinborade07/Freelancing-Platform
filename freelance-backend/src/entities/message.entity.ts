@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Project } from './project.entity';
 import { Users } from './users.entity';
 import { File } from './file.entity';
@@ -37,4 +37,5 @@ export class Message {
 
     @ManyToOne(() => File, file => file.message)
     file: File;
+
 }

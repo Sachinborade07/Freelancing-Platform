@@ -80,35 +80,22 @@ export class ProjectsService {
         return { data, count };
     }
 
-    async findByClient(clientId: number): Promise<any[]> {
+    async findByClient(clientId: number): Promise<Project[]> {
         return await this.projectsRepository
             .createQueryBuilder('project')
             .leftJoinAndSelect('project.client', 'client')
             .leftJoinAndSelect('project.freelancer', 'freelancer')
-            .leftJoinAndSelect('freelancer.user', 'user')
+            .leftJoinAndSelect('freelancer.user', 'freelancerUser')
             .leftJoinAndSelect('project.milestones', 'milestone')
             .leftJoinAndSelect('project.bids', 'bid')
+            .leftJoinAndSelect('bid.freelancer', 'bidFreelancer')
+            .leftJoinAndSelect('bidFreelancer.user', 'bidFreelancerUser')
             .leftJoinAndSelect('project.messages', 'message')
+            .leftJoinAndSelect('message.sender', 'sender')
+            .leftJoinAndSelect('message.receiver', 'receiver')
             .where('project.client_id = :clientId', { clientId })
             .orderBy('project.created_at', 'DESC')
-            .select([
-                'project.project_id',
-                'project.title',
-                'frelancer.freelancer_id',
-                'freelancer.user_id',
-                'user.username',
-                'project.description',
-                'project.budget',
-                'project.status',
-                'project.created_at',
-                'project.deadline',
-                'client.client_id',
-                'client.company_name',
-                'client.address',
-                'milestone',
-                'bid',
-                'message'
-            ])
+            .addOrderBy('message.sent_at', 'ASC')
             .getMany();
     }
 
@@ -116,29 +103,17 @@ export class ProjectsService {
         return await this.projectsRepository
             .createQueryBuilder('project')
             .leftJoinAndSelect('project.client', 'client')
+            .leftJoinAndSelect('client.user', 'clientUser')
             .leftJoinAndSelect('project.freelancer', 'freelancer')
+            .leftJoinAndSelect('freelancer.user', 'freelancerUser')
             .leftJoinAndSelect('project.milestones', 'milestone')
             .leftJoinAndSelect('project.bids', 'bid')
             .leftJoinAndSelect('project.messages', 'message')
+            .leftJoinAndSelect('message.sender', 'sender')
+            .leftJoinAndSelect('message.receiver', 'receiver')
             .where('project.freelancer_id = :freelancerId', { freelancerId })
             .orderBy('project.created_at', 'DESC')
-            .select([
-                'project.project_id',
-                'project.title',
-                'project.description',
-                'project.budget',
-                'project.status',
-                'project.created_at',
-                'project.deadline',
-                'client.client_id',
-                'client.company_name',
-                'client.address',
-                'freelancer.freelancer_id',
-                'freelancer.user_id',
-                'milestone',
-                'bid',
-                'message'
-            ])
+            .addOrderBy('message.sent_at', 'ASC')
             .getMany();
     }
 

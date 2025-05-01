@@ -440,7 +440,7 @@ const ClientDashboard = () => {
                                     }}>
                                         <p style={{ fontSize: '0.9rem', color: '#666' }}>Assigned Freelancer</p>
                                         <p style={{ fontWeight: 'bold' }}>
-                                            {project.freelancer.user?.username || 'Not assigned'}
+                                            {project.freelancer?.user.username || 'Not assigned'}
                                         </p>
                                     </div>
                                 )}
@@ -525,7 +525,20 @@ const ClientDashboard = () => {
             {showMessages && selectedProject && (
                 <ProjectMessages
                     project={selectedProject}
-                    messages={selectedProject?.messages || []}
+                    messages={selectedProject.messages?.map(msg => ({
+                        ...msg,
+                        project_id: selectedProject.project_id,
+                        receiver_id: selectedProject.freelancer_id,
+                        sender: {
+                            user_id: msg.sender_id,
+                            username: msg.sender_id === user?.user_id
+                                ? user.username
+                                : 'Freelancer',
+                            user_type: msg.sender_id === user?.user_id
+                                ? 'client'
+                                : 'freelancer'
+                        }
+                    })) || []}
                     onSendMessage={handleSendMessage}
                     onEditMessage={handleEditMessage}
                     onDeleteMessage={handleDeleteMessage}

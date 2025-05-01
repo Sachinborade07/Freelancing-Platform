@@ -14,7 +14,7 @@ export class Project {
     @Column()
     client_id: number;
 
-    @Column({ nullable: true })
+    @Column()
     freelancer_id: number;
 
     @Column({ length: 100 })
@@ -47,6 +47,9 @@ export class Project {
     @OneToMany(() => Bid, bid => bid.project)
     bids: Bid[];
 
-    @OneToMany(() => Message, message => message.project)
+    @OneToMany(() => Message, message => message.project, {
+        eager: true,
+        cascade: true
+    })
     messages: Message[];
 }
