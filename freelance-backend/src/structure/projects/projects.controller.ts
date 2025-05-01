@@ -24,6 +24,11 @@ export class ProjectsController {
         return this.projectsService.findByClient(+clientId);
     }
 
+    @Get('freelancers/:freelancerId')
+    findByFreelancer(@Param('freelancerId') freelancerId: string) {
+        return this.projectsService.findByFreelancer(+freelancerId);
+    }
+
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.projectsService.findOne(+id);
@@ -36,7 +41,6 @@ export class ProjectsController {
     ) {
         return this.projectsService.update(+id, updateProjectDto);
     }
-
 
     @Patch(':id/status')
     updateStatus(@Param('id') id: string, @Body('status') status: string) {

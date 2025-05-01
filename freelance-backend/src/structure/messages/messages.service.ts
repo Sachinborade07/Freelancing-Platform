@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from 'src/entities/message.entity';
@@ -6,6 +6,7 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { Project } from 'src/entities/project.entity';
 import { Users } from 'src/entities/users.entity';
 import { File } from 'src/entities/file.entity';
+import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class MessagesService {
@@ -72,6 +73,7 @@ export class MessagesService {
         return await this.messagesRepository.find({
             where: { project_id: projectId },
             relations: ['sender', 'receiver', 'file'],
+            order: { sent_at: 'ASC' },
         });
     }
 
@@ -86,10 +88,41 @@ export class MessagesService {
         return message;
     }
 
-    async remove(id: number): Promise<void> {
-        const result = await this.messagesRepository.delete(id);
-        if (result.affected === 0) {
+    async update(id: number, updateMessageDto: UpdateMessageDto, userId: number): Promise<Message> {
+        const message = await this.messagesRepository.findOne({
+            where: { message_id: id },
+            relations: ['sender'],
+        });
+
+        if (!message) {
             throw new NotFoundException(`Message with ID ${id} not found`);
         }
+
+        if (message.sender.user_id !== userId) {
+            throw new ForbiddenException('You can only update your own messages');
+        }
+
+        if (updateMessageDto.content) {
+            message.content = updateMessageDto.content;
+        }
+
+        return await this.messagesRepository.save(message);
+    }
+
+    async remove(id: number, userId: number): Promise<void> {
+        const message = await this.messagesRepository.findOne({
+            where: { message_id: id },
+            relations: ['sender'],
+        });
+
+        if (!message) {
+            throw new NotFoundException(`Message with ID ${id} not found`);
+        }
+
+        if (message.sender.user_id !== userId) {
+            throw new ForbiddenException('You can only delete your own messages');
+        }
+
+        await this.messagesRepository.remove(message);
     }
 }

@@ -6,11 +6,15 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Client } from 'src/entities/client.entity';
 import { ProjectQueryDto } from './dto/query-project.dto';
+import { Freelancer } from 'src/entities/freelancer.entity';
 
 
 @Injectable()
 export class ProjectsService {
+
     constructor(
+        @InjectRepository(Freelancer)
+        private freelancersRepository: Repository<Freelancer>,
         @InjectRepository(Project)
         private projectsRepository: Repository<Project>,
         @InjectRepository(Client)
@@ -76,18 +80,73 @@ export class ProjectsService {
         return { data, count };
     }
 
-    async findByClient(clientId: number): Promise<Project[]> {
-        return await this.projectsRepository.find({
-            where: { client_id: clientId },
-            relations: ['milestones', 'bids'],
-        });
+    async findByClient(clientId: number): Promise<any[]> {
+        return await this.projectsRepository
+            .createQueryBuilder('project')
+            .leftJoinAndSelect('project.client', 'client')
+            .leftJoinAndSelect('project.freelancer', 'freelancer')
+            .leftJoinAndSelect('freelancer.user', 'user')
+            .leftJoinAndSelect('project.milestones', 'milestone')
+            .leftJoinAndSelect('project.bids', 'bid')
+            .leftJoinAndSelect('project.messages', 'message')
+            .where('project.client_id = :clientId', { clientId })
+            .orderBy('project.created_at', 'DESC')
+            .select([
+                'project.project_id',
+                'project.title',
+                'frelancer.freelancer_id',
+                'freelancer.user_id',
+                'user.username',
+                'project.description',
+                'project.budget',
+                'project.status',
+                'project.created_at',
+                'project.deadline',
+                'client.client_id',
+                'client.company_name',
+                'client.address',
+                'milestone',
+                'bid',
+                'message'
+            ])
+            .getMany();
+    }
+
+    async findByFreelancer(freelancerId: number): Promise<Project[]> {
+        return await this.projectsRepository
+            .createQueryBuilder('project')
+            .leftJoinAndSelect('project.client', 'client')
+            .leftJoinAndSelect('project.freelancer', 'freelancer')
+            .leftJoinAndSelect('project.milestones', 'milestone')
+            .leftJoinAndSelect('project.bids', 'bid')
+            .leftJoinAndSelect('project.messages', 'message')
+            .where('project.freelancer_id = :freelancerId', { freelancerId })
+            .orderBy('project.created_at', 'DESC')
+            .select([
+                'project.project_id',
+                'project.title',
+                'project.description',
+                'project.budget',
+                'project.status',
+                'project.created_at',
+                'project.deadline',
+                'client.client_id',
+                'client.company_name',
+                'client.address',
+                'freelancer.freelancer_id',
+                'freelancer.user_id',
+                'milestone',
+                'bid',
+                'message'
+            ])
+            .getMany();
     }
 
     async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
 
         const project = await this.projectsRepository.findOne({
             where: { project_id: id },
-            relations: ['client'],
+            relations: ['client', 'freelancer', 'milestones', 'bids', 'messages'],
         });
 
         if (!project) {
@@ -109,6 +168,16 @@ export class ProjectsService {
 
         if (updateProjectDto.budget) {
             project.budget = updateProjectDto.budget;
+        }
+
+        if (updateProjectDto.freelancer_id !== undefined) {
+            const freelancer = await this.freelancersRepository.findOneBy({
+                freelancer_id: updateProjectDto.freelancer_id
+            });
+            if (!freelancer) {
+                throw new NotFoundException(`Freelancer with ID ${updateProjectDto.freelancer_id} not found`);
+            }
+            project.freelancer = freelancer;
         }
 
         return await this.projectsRepository.save(project);

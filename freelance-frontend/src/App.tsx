@@ -1,42 +1,31 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './pages/Navbar';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ProjectListPage from './pages/ProjectListPage';
-import CreateProjectPage from './pages/CreateProjectPage';
-import ProjectDetailPage from './pages/ProjectDetailPage';
-import EditProjectPage from './pages/EditProjectPage';
-import MyBidsPage from './pages/MyBidsPage';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import Login from './app/login/login';
+import Register from './app/register/register';
+import DashboardPage from './app/dashboard/home';
+import FreelancerProfilePage from './app/dashboard/profile/Profile';
+import ProjectDetailsPage from './app/dashboard/Project/Project';
+import NewProjectPage from './app/dashboard/Project/NewProject';
+import FreelancerBidsPage from './app/dashboard/bids/bids';
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/projects" element={<ProjectListPage />} />
-          <Route path="/projects/:id" element={<ProjectDetailPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<DashboardPage />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="profile" element={<FreelancerProfilePage />} />
+          <Route path="projects" element={<ProjectDetailsPage />} />
+          <Route path="projects/new" element={<NewProjectPage />} />
+          <Route path="projects/:projectId" element={<ProjectDetailsPage />} />
+          <Route path="bids" element={<FreelancerBidsPage />} />
         </Route>
-
-        <Route element={<ProtectedRoute allowedRoles={['client']} />}>
-          <Route path="/projects/create" element={<CreateProjectPage />} />
-          <Route path="/projects/:id/edit" element={<EditProjectPage />} />
-        </Route>
-
-        <Route element={<ProtectedRoute allowedRoles={['freelancer']} />}>
-          <Route path="/my-bids" element={<MyBidsPage />} />
-        </Route>
-
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </>
+      </Route>
+    </Routes>
   );
 };
 

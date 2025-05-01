@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateProjectDto } from './create-project.dto';
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 import { IsValidProjectStatus } from 'src/validator/project-status.validator';
 
 
@@ -14,4 +14,9 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
     @IsArray()
     @IsString({ each: true })
     files?: string[];
+
+    @IsOptional()
+    @IsNumber()
+    freelancer_id?: number;
+
 }

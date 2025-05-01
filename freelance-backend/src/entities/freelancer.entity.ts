@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, OneToMany
 import { Users } from './users.entity';
 import { FreelancerSkill } from './freelance-skill.entity';
 import { Bid } from './bid.entity';
+import { Project } from './project.entity';
 
 
 @Entity()
@@ -27,6 +28,9 @@ export class Freelancer {
 
     @OneToMany(() => FreelancerSkill, freelancerSkill => freelancerSkill.freelancer)
     skills: FreelancerSkill[];
+
+    @OneToMany(() => Project, project => project.freelancer)
+    projects: Project[];
 
     @OneToMany(() => Bid, bid => bid.freelancer)
     bids: Bid[];

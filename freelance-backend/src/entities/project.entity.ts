@@ -3,6 +3,7 @@ import { Client } from './client.entity';
 import { Milestone } from './milestone.entity';
 import { Bid } from './bid.entity';
 import { Message } from './message.entity';
+import { Freelancer } from './freelancer.entity';
 
 
 @Entity()
@@ -12,6 +13,9 @@ export class Project {
 
     @Column()
     client_id: number;
+
+    @Column({ nullable: true })
+    freelancer_id: number;
 
     @Column({ length: 100 })
     title: string;
@@ -33,6 +37,9 @@ export class Project {
 
     @ManyToOne(() => Client, client => client.projects)
     client: Client;
+
+    @ManyToOne(() => Freelancer, freelancer => freelancer.projects)
+    freelancer: Freelancer;
 
     @OneToMany(() => Milestone, milestone => milestone.project)
     milestones: Milestone[];

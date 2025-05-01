@@ -4,12 +4,14 @@ import { ProjectsController } from './projects.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from 'src/entities/project.entity';
 import { Client } from 'src/entities/client.entity';
+import { Freelancer } from 'src/entities/freelancer.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Project,
       Client,
+      Freelancer
     ]),
   ],
   providers: [ProjectsService],
