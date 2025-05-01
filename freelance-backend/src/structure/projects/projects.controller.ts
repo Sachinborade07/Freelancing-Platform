@@ -30,9 +30,13 @@ export class ProjectsController {
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
+    async update(
+        @Param('id') id: string,
+        @Body() updateProjectDto: UpdateProjectDto
+    ) {
         return this.projectsService.update(+id, updateProjectDto);
     }
+
 
     @Patch(':id/status')
     updateStatus(@Param('id') id: string, @Body('status') status: string) {

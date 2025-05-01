@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api/Project';
+import api from '../api/project';
 import { Project } from '../types/Project';
 import BidList from '../components/BidList';
 

@@ -76,8 +76,6 @@ export class ProjectsService {
         return { data, count };
     }
 
-
-
     async findByClient(clientId: number): Promise<Project[]> {
         return await this.projectsRepository.find({
             where: { client_id: clientId },
@@ -86,10 +84,36 @@ export class ProjectsService {
     }
 
     async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
-        const project = await this.findOne(id);
-        this.projectsRepository.merge(project, updateProjectDto);
+
+        const project = await this.projectsRepository.findOne({
+            where: { project_id: id },
+            relations: ['client'],
+        });
+
+        if (!project) {
+            throw new Error(`Project with ID ${id} not found`);
+        }
+
+        if (updateProjectDto.status) {
+            project.status = updateProjectDto.status;
+        }
+
+
+        if (updateProjectDto.title) {
+            project.title = updateProjectDto.title;
+        }
+
+        if (updateProjectDto.description) {
+            project.description = updateProjectDto.description;
+        }
+
+        if (updateProjectDto.budget) {
+            project.budget = updateProjectDto.budget;
+        }
+
         return await this.projectsRepository.save(project);
     }
+
 
     async updateStatus(id: number, status: string): Promise<Project> {
         const project = await this.findOne(id);

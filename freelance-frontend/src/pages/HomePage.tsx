@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import ClientProjects from './ClientsProject';
 
 const HomePage = () => {
     const { isAuthenticated, user } = useAuth();
@@ -12,11 +13,14 @@ const HomePage = () => {
                     <h2>Hello, {user?.username}!</h2>
                     <p>You are logged in as a {user?.user_type}.</p>
                     {user?.user_type === 'client' ? (
-                        <Link to="/projects/create">
-                            <button style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>
-                                Create New Project
-                            </button>
-                        </Link>
+                        <>
+                            <Link to="/projects/create">
+                                <button style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>
+                                    Create New Project
+                                </button>
+                            </Link>
+                            <ClientProjects /> {/* ✅ renders project list for clients */}
+                        </>
                     ) : (
                         <Link to="/projects">
                             <button style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>

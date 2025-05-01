@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import api from '../api/Project'
+import api from '../api/project'
 import { Project } from '../types/Project';
 
 const ProjectListPage = () => {
