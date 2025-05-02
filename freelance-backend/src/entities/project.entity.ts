@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { Client } from './client.entity';
 import { Milestone } from './milestone.entity';
 import { Bid } from './bid.entity';
@@ -38,8 +38,7 @@ export class Project {
     @ManyToOne(() => Client, client => client.projects)
     client: Client;
 
-    @ManyToOne(() => Freelancer)
-    @JoinColumn({ name: 'freelancer_id' })
+    @ManyToOne(() => Freelancer, freelancer => freelancer.projects)
     freelancer: Freelancer;
 
     @OneToMany(() => Milestone, milestone => milestone.project)
@@ -48,9 +47,6 @@ export class Project {
     @OneToMany(() => Bid, bid => bid.project)
     bids: Bid[];
 
-    @OneToMany(() => Message, message => message.project, {
-        eager: true,
-        cascade: true
-    })
+    @OneToMany(() => Message, message => message.project)
     messages: Message[];
 }

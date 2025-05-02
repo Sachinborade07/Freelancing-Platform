@@ -7,7 +7,6 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Client } from 'src/entities/client.entity';
 import { ProjectQueryDto } from './dto/query-project.dto';
 import { Freelancer } from 'src/entities/freelancer.entity';
-import { error } from 'console';
 
 
 @Injectable()
@@ -33,9 +32,6 @@ export class ProjectsService {
         const project = this.projectsRepository.create({
             ...createProjectDto,
             client,
-            Freelancer.freelancer_id,
-
-            status: createProjectDto.status || 'open'
         });
         return await this.projectsRepository.save(project);
     }
@@ -85,83 +81,87 @@ export class ProjectsService {
     }
 
     async findByClient(clientId: number): Promise<Project[]> {
-        return await this.projectsRepository
-            .createQueryBuilder('project')
-            .leftJoinAndSelect('project.client', 'client')
-            .leftJoinAndSelect('project.freelancer', 'freelancer')
-            .leftJoinAndSelect('freelancer.user', 'freelancerUser')
-            .leftJoinAndSelect('project.milestones', 'milestone')
-            .leftJoinAndSelect('project.bids', 'bid')
-            .leftJoinAndSelect('bid.freelancer', 'bidFreelancer')
-            .leftJoinAndSelect('bidFreelancer.user', 'bidFreelancerUser')
-            .leftJoinAndSelect('project.messages', 'message')
-            .leftJoinAndSelect('message.sender', 'sender')
-            .leftJoinAndSelect('message.receiver', 'receiver')
-            .where('project.client_id = :clientId', { clientId })
-            .orderBy('project.created_at', 'DESC')
-            .addOrderBy('message.sent_at', 'ASC')
-            .getMany();
+        return await this.projectsRepository.find({
+            where: { client_id: clientId },
+            relations: [
+                'client',
+                'freelancer',
+                'freelancer.user',
+                'milestones',
+                'bids',
+                'messages'
+            ],
+            order: { created_at: 'DESC' }
+        });
     }
 
     async findByFreelancer(freelancerId: number): Promise<Project[]> {
         return await this.projectsRepository
             .createQueryBuilder('project')
             .leftJoinAndSelect('project.client', 'client')
-            .leftJoinAndSelect('client.user', 'clientUser')
             .leftJoinAndSelect('project.freelancer', 'freelancer')
-            .leftJoinAndSelect('freelancer.user', 'freelancerUser')
             .leftJoinAndSelect('project.milestones', 'milestone')
             .leftJoinAndSelect('project.bids', 'bid')
             .leftJoinAndSelect('project.messages', 'message')
-            .leftJoinAndSelect('message.sender', 'sender')
-            .leftJoinAndSelect('message.receiver', 'receiver')
             .where('project.freelancer_id = :freelancerId', { freelancerId })
             .orderBy('project.created_at', 'DESC')
-            .addOrderBy('message.sent_at', 'ASC')
+            .select([
+                'project.project_id',
+                'project.title',
+                'project.description',
+                'project.budget',
+                'project.status',
+                'project.created_at',
+                'project.deadline',
+                'client.client_id',
+                'client.company_name',
+                'client.address',
+                'freelancer.freelancer_id',
+                'freelancer.user_id',
+                'milestone',
+                'bid',
+                'message'
+            ])
             .getMany();
     }
 
     async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
+
         const project = await this.projectsRepository.findOne({
             where: { project_id: id },
             relations: ['client', 'freelancer', 'milestones', 'bids', 'messages'],
         });
 
         if (!project) {
-            throw new NotFoundException(`Project with ID ${id} not found`);
+            throw new Error(`Project with ID ${id} not found`);
         }
 
-        if (updateProjectDto.title !== undefined) {
-            project.title = updateProjectDto.title;
-        }
-        if (updateProjectDto.description !== undefined) {
-            project.description = updateProjectDto.description;
-        }
-        if (updateProjectDto.budget !== undefined) {
-            project.budget = updateProjectDto.budget;
-        }
-        if (updateProjectDto.status !== undefined) {
+        if (updateProjectDto.status) {
             project.status = updateProjectDto.status;
         }
-        if (updateProjectDto.deadline !== undefined) {
-            project.deadline = updateProjectDto.deadline ? new Date(updateProjectDto.deadline) : null;
+
+
+        if (updateProjectDto.title) {
+            project.title = updateProjectDto.title;
         }
 
-
-
-        const freelancer = await this.freelancersRepository.findOne({
-            where: { freelancer_id: updateProjectDto.freelancer_id },
-            relations: ['user']
-        });
-
-        if (!freelancer) {
-            throw new NotFoundException(`Freelancer with ID ${updateProjectDto.freelancer_id} not found`);
+        if (updateProjectDto.description) {
+            project.description = updateProjectDto.description;
         }
 
-        project.freelancer = freelancer;
-        project.freelancer_id = freelancer.freelancer_id;
+        if (updateProjectDto.budget) {
+            project.budget = updateProjectDto.budget;
+        }
 
-
+        if (updateProjectDto.freelancer_id !== undefined) {
+            const freelancer = await this.freelancersRepository.findOneBy({
+                freelancer_id: updateProjectDto.freelancer_id
+            });
+            if (!freelancer) {
+                throw new NotFoundException(`Freelancer with ID ${updateProjectDto.freelancer_id} not found`);
+            }
+            project.freelancer = freelancer;
+        }
 
         return await this.projectsRepository.save(project);
     }
@@ -178,30 +178,5 @@ export class ProjectsService {
         if (result.affected === 0) {
             throw new NotFoundException(`Project with ID ${id} not found`);
         }
-    }
-
-    async assignFreelancer(projectId: number, freelancerId: number): Promise<Project> {
-        const project = await this.projectsRepository.findOne({
-            where: { project_id: projectId },
-            relations: ['freelancer']
-        });
-
-        if (!project) {
-            throw new NotFoundException(`Project with ID ${projectId} not found`);
-        }
-
-        const freelancer = await this.freelancersRepository.findOne({
-            where: { freelancer_id: freelancerId }
-        });
-
-        if (!freelancer) {
-            throw new NotFoundException(`Freelancer with ID ${freelancerId} not found`);
-        }
-
-        project.freelancer = freelancer;
-        project.freelancer_id = freelancerId;
-        project.status = 'in_progress';
-
-        return this.projectsRepository.save(project);
     }
 }

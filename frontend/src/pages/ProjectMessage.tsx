@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Project } from '../api/project/project';
 import { Message } from '../types/message';
 
+
 interface ProjectMessagesProps {
     project: Project;
+    currentUserId: number;
     messages: Message[];
-    onSendMessage: (content: string) => void;
-    onEditMessage: (message: Message) => void;
-    onDeleteMessage: (messageId: number) => void;
+    onSendMessage: (content: string) => Promise<void>;
     onClose: () => void;
 }
 
@@ -15,8 +15,6 @@ const ProjectMessages = ({
     project,
     messages,
     onSendMessage,
-    onEditMessage,
-    onDeleteMessage,
     onClose
 }: ProjectMessagesProps) => {
     const [messageContent, setMessageContent] = useState('');
@@ -29,11 +27,6 @@ const ProjectMessages = ({
         }
     };
 
-    const confirmDelete = (messageId: number) => {
-        if (window.confirm('Are you sure you want to delete this message?')) {
-            onDeleteMessage(messageId);
-        }
-    };
 
     return (
         <div style={{
@@ -148,7 +141,6 @@ const ProjectMessages = ({
                                     }}>
                                         {message.content}
 
-                                        {/* Edit/Delete buttons for client's messages */}
                                         {message.sender?.user_type === 'client' && (
                                             <div style={{
                                                 position: 'absolute',
@@ -158,40 +150,7 @@ const ProjectMessages = ({
                                                 flexDirection: 'column',
                                                 gap: '5px'
                                             }}>
-                                                <button
-                                                    onClick={() => onEditMessage(message)}
-                                                    style={{
-                                                        background: '#ffc107',
-                                                        border: 'none',
-                                                        borderRadius: '50%',
-                                                        width: '25px',
-                                                        height: '25px',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}
-                                                    title="Edit message"
-                                                >
-                                                    ✏️
-                                                </button>
-                                                <button
-                                                    onClick={() => confirmDelete(message.message_id)}
-                                                    style={{
-                                                        background: '#dc3545',
-                                                        border: 'none',
-                                                        borderRadius: '50%',
-                                                        width: '25px',
-                                                        height: '25px',
-                                                        cursor: 'pointer',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}
-                                                    title="Delete message"
-                                                >
-                                                    🗑️
-                                                </button>
+
                                             </div>
                                         )}
                                     </div>

@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Req } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectQueryDto } from './dto/query-project.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller('projects')
@@ -20,7 +21,11 @@ export class ProjectsController {
     }
 
     @Get('clients/:clientId')
-    findByClient(@Param('clientId') clientId: string) {
+    @UseGuards(AuthGuard('jwt'))
+    async findByClient(
+        @Param('clientId') clientId: string,
+        @Req() request: Request
+    ) {
         return this.projectsService.findByClient(+clientId);
     }
 
