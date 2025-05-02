@@ -598,9 +598,9 @@ const ClientDashboard = () => {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: '80%',
-                        maxWidth: '800px',
-                        maxHeight: '80vh',
+                        width: '90%',  // Increased width
+                        maxWidth: '1000px',  // Increased max width
+                        maxHeight: '90vh',  // Increased height
                         backgroundColor: 'white',
                         borderRadius: '10px',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
