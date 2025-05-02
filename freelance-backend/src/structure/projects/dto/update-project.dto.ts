@@ -11,12 +11,27 @@ export class UpdateProjectDto extends PartialType(CreateProjectDto) {
     status?: string;
 
     @IsOptional()
-    @IsArray()
-    @IsString({ each: true })
-    files?: string[];
+    @IsString()
+    title?: string;
+
+    @IsOptional()
+    @IsString()
+    description?: string;
+
+    @IsOptional()
+    @IsNumber()
+    budget?: number;
+
+    @IsOptional()
+    @IsString()
+    deadline?: string;
 
     @IsOptional()
     @IsNumber()
     freelancer_id?: number;
 
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    files?: string[];
 }

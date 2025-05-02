@@ -7,6 +7,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { Client } from 'src/entities/client.entity';
 import { ProjectQueryDto } from './dto/query-project.dto';
 import { Freelancer } from 'src/entities/freelancer.entity';
+import { error } from 'console';
 
 
 @Injectable()
@@ -32,6 +33,9 @@ export class ProjectsService {
         const project = this.projectsRepository.create({
             ...createProjectDto,
             client,
+            Freelancer.freelancer_id,
+
+            status: createProjectDto.status || 'open'
         });
         return await this.projectsRepository.save(project);
     }
@@ -118,42 +122,46 @@ export class ProjectsService {
     }
 
     async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
-
         const project = await this.projectsRepository.findOne({
             where: { project_id: id },
             relations: ['client', 'freelancer', 'milestones', 'bids', 'messages'],
         });
 
         if (!project) {
-            throw new Error(`Project with ID ${id} not found`);
+            throw new NotFoundException(`Project with ID ${id} not found`);
         }
 
-        if (updateProjectDto.status) {
-            project.status = updateProjectDto.status;
-        }
-
-
-        if (updateProjectDto.title) {
+        if (updateProjectDto.title !== undefined) {
             project.title = updateProjectDto.title;
         }
-
-        if (updateProjectDto.description) {
+        if (updateProjectDto.description !== undefined) {
             project.description = updateProjectDto.description;
         }
-
-        if (updateProjectDto.budget) {
+        if (updateProjectDto.budget !== undefined) {
             project.budget = updateProjectDto.budget;
         }
-
-        if (updateProjectDto.freelancer_id !== undefined) {
-            const freelancer = await this.freelancersRepository.findOneBy({
-                freelancer_id: updateProjectDto.freelancer_id
-            });
-            if (!freelancer) {
-                throw new NotFoundException(`Freelancer with ID ${updateProjectDto.freelancer_id} not found`);
-            }
-            project.freelancer = freelancer;
+        if (updateProjectDto.status !== undefined) {
+            project.status = updateProjectDto.status;
         }
+        if (updateProjectDto.deadline !== undefined) {
+            project.deadline = updateProjectDto.deadline ? new Date(updateProjectDto.deadline) : null;
+        }
+
+
+
+        const freelancer = await this.freelancersRepository.findOne({
+            where: { freelancer_id: updateProjectDto.freelancer_id },
+            relations: ['user']
+        });
+
+        if (!freelancer) {
+            throw new NotFoundException(`Freelancer with ID ${updateProjectDto.freelancer_id} not found`);
+        }
+
+        project.freelancer = freelancer;
+        project.freelancer_id = freelancer.freelancer_id;
+
+
 
         return await this.projectsRepository.save(project);
     }
@@ -170,5 +178,30 @@ export class ProjectsService {
         if (result.affected === 0) {
             throw new NotFoundException(`Project with ID ${id} not found`);
         }
+    }
+
+    async assignFreelancer(projectId: number, freelancerId: number): Promise<Project> {
+        const project = await this.projectsRepository.findOne({
+            where: { project_id: projectId },
+            relations: ['freelancer']
+        });
+
+        if (!project) {
+            throw new NotFoundException(`Project with ID ${projectId} not found`);
+        }
+
+        const freelancer = await this.freelancersRepository.findOne({
+            where: { freelancer_id: freelancerId }
+        });
+
+        if (!freelancer) {
+            throw new NotFoundException(`Freelancer with ID ${freelancerId} not found`);
+        }
+
+        project.freelancer = freelancer;
+        project.freelancer_id = freelancerId;
+        project.status = 'in_progress';
+
+        return this.projectsRepository.save(project);
     }
 }

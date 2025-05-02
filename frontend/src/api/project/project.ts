@@ -1,35 +1,37 @@
-import { Client } from "../../types/client";
-import { Freelancer } from "../../types/freelancer";
+import { Message } from "../../types/message";
+import { Milestone } from "../../types/milestone";
+import { Bid } from "../bid/bid";
 
 export interface Project {
     project_id: number;
     title: string;
     description: string;
-    budget: string;
-    freelancer_id: number;
-    status: 'open' | 'in_progress' | 'completed';
+    budget: number;
+    status: 'draft' | 'posted' | 'in_progress' | 'completed' | 'cancelled';
     created_at: string;
     deadline: string | null;
     client_id: number;
-    client: Client;
-    freelancer?: Freelancer
-    milestones?: Array<{
-        milestone_id: number;
-        title: string;
-        status: string;
-        due_date: string;
-    }>;
-    bids?: Array<{
-        bid_id: number;
-        status: string;
+    freelancer_id: number | null;
+    client: {
+        client_id: number;
+        user_id: number;
+        company_name: string;
+        address: string;
+    };
+    freelancer?: {
         freelancer_id: number;
-    }>;
-    messages?: Array<{
-        message_id: number;
-        content: string;
-        sent_at: string;
-        sender_id: number;
-    }>;
+        user_id: number;
+        bio?: string;
+        experience?: string;
+        hourly_rate?: number;
+        user?: {
+            user_id: number;
+            username: string;
+        };
+    } | null;
+    milestones?: Milestone[];
+    bids?: Bid[];
+    messages?: Message[];
 }
 
 export interface ProjectsApiResponse {

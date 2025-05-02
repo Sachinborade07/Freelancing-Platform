@@ -142,6 +142,13 @@ const ClientDashboard = () => {
         if (!selectedProject || !user) return;
 
         try {
+            // Find the accepted bid
+            const acceptedBid = selectedProject.bids?.find(b => b.status === 'accepted');
+
+            if (!acceptedBid && user.user_type !== 'freelancer') {
+                throw new Error('No freelancer has been assigned to this project yet');
+            }
+
             const response = await fetch('http://localhost:3000/messages', {
                 method: 'POST',
                 headers: {
@@ -151,16 +158,26 @@ const ClientDashboard = () => {
                 body: JSON.stringify({
                     project_id: selectedProject.project_id,
                     sender_id: user.user_id,
-                    receiver_id: selectedProject.bids?.find(b => b.status === 'accepted')?.freelancer_id,
+                    receiver_id: user.user_type === 'client'
+                        ? acceptedBid?.freelancer_id
+                        : selectedProject.client_id,
                     content
                 }),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to send message');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to send message');
             }
 
-            await fetchClientProjects();
+            // Refresh messages without reloading entire project
+            const updatedProject = await fetch(`http://localhost:3000/projects/${selectedProject.project_id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }).then(res => res.json());
+
+            setSelectedProject(updatedProject);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error sending message');
             console.error(err);
@@ -440,7 +457,7 @@ const ClientDashboard = () => {
                                     }}>
                                         <p style={{ fontSize: '0.9rem', color: '#666' }}>Assigned Freelancer</p>
                                         <p style={{ fontWeight: 'bold' }}>
-                                            {project.freelancer?.user.username || 'Not assigned'}
+                                            {project.freelancer?.user_id || 'Not assigned'}
                                         </p>
                                     </div>
                                 )}
@@ -528,7 +545,7 @@ const ClientDashboard = () => {
                     messages={selectedProject.messages?.map(msg => ({
                         ...msg,
                         project_id: selectedProject.project_id,
-                        receiver_id: selectedProject.freelancer_id,
+                        receiver_id: selectedProject.freelancer_id || msg.receiver_id || null,
                         sender: {
                             user_id: msg.sender_id,
                             username: msg.sender_id === user?.user_id

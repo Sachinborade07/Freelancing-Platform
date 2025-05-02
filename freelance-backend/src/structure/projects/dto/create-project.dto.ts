@@ -27,9 +27,13 @@ export class CreateProjectDto {
     @Min(0)
     budget: number;
 
+    @IsOptional()
+    @IsNumber()
+    freelancer_id?: number;
+
     @IsNotEmpty()
     @IsValidProjectStatus(['draft', 'posted', 'in_progress', 'completed', 'cancelled'])
-    status: string;
+    status?: string;
 
     @IsNotEmpty()
     @IsDateString()

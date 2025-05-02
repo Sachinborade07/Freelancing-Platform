@@ -13,6 +13,7 @@ const UpdateProjectModal = ({ project, onUpdate, onClose }: UpdateProjectModalPr
     const [budget, setBudget] = useState(project.budget);
     const [deadline, setDeadline] = useState(project.deadline || '');
     const [status, setStatus] = useState(project.status);
+    const [selectedFreelancerId] = useState<number | null>(project.freelancer_id || null);
 
     useEffect(() => {
         setTitle(project.title);
@@ -27,9 +28,10 @@ const UpdateProjectModal = ({ project, onUpdate, onClose }: UpdateProjectModalPr
         onUpdate({
             title,
             description,
-            budget,
-            ...(deadline && { deadline }),
-            status
+            budget: Number(budget),
+            status,
+            deadline: deadline || null,
+            freelancer_id: selectedFreelancerId
         });
     };
 
@@ -79,7 +81,7 @@ const UpdateProjectModal = ({ project, onUpdate, onClose }: UpdateProjectModalPr
                         <input
                             type="number"
                             value={budget}
-                            onChange={(e) => setBudget(e.target.value)}
+                            onChange={(e) => setBudget(Number(e.target.value))}
                             required
                             style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
                         />

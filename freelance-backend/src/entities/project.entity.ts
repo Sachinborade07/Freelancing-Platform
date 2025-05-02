@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Client } from './client.entity';
 import { Milestone } from './milestone.entity';
 import { Bid } from './bid.entity';
@@ -38,7 +38,8 @@ export class Project {
     @ManyToOne(() => Client, client => client.projects)
     client: Client;
 
-    @ManyToOne(() => Freelancer, freelancer => freelancer.projects)
+    @ManyToOne(() => Freelancer)
+    @JoinColumn({ name: 'freelancer_id' })
     freelancer: Freelancer;
 
     @OneToMany(() => Milestone, milestone => milestone.project)
